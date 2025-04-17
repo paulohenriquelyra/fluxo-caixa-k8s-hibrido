@@ -8,7 +8,7 @@
 
 ---
 
-## Índice - completo e funcional no PDF (70 páginas com detalhes - tenha paciência e dúvidas me pergunte)
+## Índice - completo e funcional no PDF com 70 páginas e bem mais detalhe
 
 - [1. Objetivo](#objetivo)
 - [2. Objetivo do Sistema](#objetivo-do-sistema)
