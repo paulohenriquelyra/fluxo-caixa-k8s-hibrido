@@ -8,7 +8,7 @@
 
 ---
 
-## Índice
+## Índice - completo e funcional no PDF (70 páginas com detalhes - tenha paciência e dúvidas me pergunte)
 
 - [1. Objetivo](#objetivo)
 - [2. Objetivo do Sistema](#objetivo-do-sistema)
@@ -376,7 +376,7 @@ A aplicação de FinOps e governança resulta em uma solução eficiente, segura
 
 ### DC On Premises XPTO
 
-![Figura 4 - Topologia DC On-premises](https://github.com/paulohenriquelyra/fluxo-caixa-k8s-hibrido/blob/main/diagrams/diagrama-topologia-on-premises) 
+![Figura 4 - Topologia DC On-premises](https://github.com/paulohenriquelyra/fluxo-caixa-k8s-hibrido/blob/main/diagrams/diagrama-topologia-dc-on-premises.png) 
 
 
 ### CLOUD CENÁRIO DC XPTO <-> AWS
@@ -690,7 +690,7 @@ A solução é robusta, segura, eficiente, resiliente e bem governada, combinand
 
 ### Sobre Paulo Lyra
 
-**Perfil:** Profissional sênior com 34 anos de experiência em TI e Telecomunicações, com atuação em empresas como iBest, Brasil Telecom, Oi e V.tal. 
+**Perfil:** Profissional sênior com + de 34 anos de experiência em TI e Telecomunicações, com atuação em empresas como iBest, Brasil Telecom, Oi e V.tal. 
 
 
 **Contatos:**
