@@ -117,7 +117,7 @@ Desenvolver uma solução moderna, modular, e escalável para o sistema de fluxo
 ### Sizing do Banco de Dados
 
 - Lançamento típico de fluxo de caixa: ~3 KB por lançamento (com margem de 1 KB adicional).
-![Figura 1 – Tamanho Registo Banco de Dados](https://github.com/paulohenriquelyra/fluxo-caixa-k8s-hibrido/blob/main/docs/figura1.png)
+![Figura 1 – Tamanho Registo Banco de Dados](https://github.com/paulohenriquelyra/fluxo-caixa-k8s-hibrido/blob/main/docs/figura-1.png)
 - Crescimento anual de 20%.
 
 | Ano  | Dados de Lançamentos (GB) | Índices (GB) | Overhead (GB) | Subtotal (GB) |
@@ -212,8 +212,8 @@ Desenvolver uma solução moderna, modular, e escalável para o sistema de fluxo
 - **Grafana:** 1 pod (100m–200m CPU, 256Mi–512Mi RAM).
 - **Fluentd (DaemonSet):** 10 pods (55m–110m CPU, 140Mi–280Mi RAM per pod).
 
-![Figura 2 – racional consumo de pods](https://github.com/paulohenriquelyra/fluxo-caixa-k8s-hibrido/blob/main/docs/figura2.png)
-![Figura 3 – racional consumo de pods DR ](https://github.com/paulohenriquelyra/fluxo-caixa-k8s-hibrido/blob/main/docs/figura3.png)
+![Figura 2 – racional consumo de pods](https://github.com/paulohenriquelyra/fluxo-caixa-k8s-hibrido/blob/main/docs/figura-2.png)
+![Figura 3 – racional consumo de pods DR ](https://github.com/paulohenriquelyra/fluxo-caixa-k8s-hibrido/blob/main/docs/figura-3.png)
 
 
 #### Cálculo do Número de Worker Nodes por Ambiente
@@ -376,7 +376,7 @@ A aplicação de FinOps e governança resulta em uma solução eficiente, segura
 
 ### DC On Premises XPTO
 
-![Figura 4 - Topologia DC On-premises](https://github.com/paulohenriquelyra/fluxo-caixa-k8s-hibrido/blob/main/diagrams/diagrama-topologia-on-premises.
+![Figura 4 - Topologia DC On-premises](https://github.com/paulohenriquelyra/fluxo-caixa-k8s-hibrido/blob/main/diagrams/diagrama-topologia-on-premises) 
 
 
 ### CLOUD CENÁRIO DC XPTO <-> AWS
@@ -479,14 +479,22 @@ O código será gerenciado em um repositório público no GitHub, com GitHub Act
 ```
 fluxo-de-caixa/
 ├── src/                    # Código-fonte (Node.js)
-├── Dockerfile              # Imagem Docker
-├── helm/                   # Helm Chart
+│   └── Dockerfile          # Imagem Docker para a aplicação Node.js
+├── k8s/                    # Configurações do Kubernetes
+│   ├── deployment.yaml     # Manifest para deployment da aplicação
+│   ├── service.yaml        # Manifest para o service
+│   └── ingress.yaml        # Manifest para o ingress
+├── helm/                   # Helm Chart para implantação no K8s
+│   ├── Chart.yaml          # Definição do Helm Chart
+│   ├── values.yaml         # Valores padrão para o chart
+│   └── templates/          # Templates do Helm
 ├── tests/                  # Testes automatizados
 ├── .github/workflows/      # Workflows GitHub Actions
 │   ├── ci-cd.yaml          # Pipeline CI/CD
 │   └── security-scan.yaml  # Varredura de segurança
 ├── README.md               # Documentação
 └── docs/                   # Documentação adicional
+
 ```
 
 - **Branches:** `main` (produção), `develop` (desenvolvimento), `feature/*`.
