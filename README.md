@@ -117,7 +117,7 @@ Desenvolver uma solução moderna, modular, e escalável para o sistema de fluxo
 ### Sizing do Banco de Dados
 
 - Lançamento típico de fluxo de caixa: ~3 KB por lançamento (com margem de 1 KB adicional).
-![Figura 1 – Tamanho Registo Banco de Dados](https://github.com/paulohenriquelyra/fluxo-caixa-k8s-hibrido/tree/main/docs/figura1.png)
+![Figura 1 – Tamanho Registo Banco de Dados](https://github.com/paulohenriquelyra/fluxo-caixa-k8s-hibrido/blob/main/docs/figura1.png)
 - Crescimento anual de 20%.
 
 | Ano  | Dados de Lançamentos (GB) | Índices (GB) | Overhead (GB) | Subtotal (GB) |
@@ -212,8 +212,8 @@ Desenvolver uma solução moderna, modular, e escalável para o sistema de fluxo
 - **Grafana:** 1 pod (100m–200m CPU, 256Mi–512Mi RAM).
 - **Fluentd (DaemonSet):** 10 pods (55m–110m CPU, 140Mi–280Mi RAM per pod).
 
-![Figura 2 – racional consumo de pods](https://github.com/paulohenriquelyra/fluxo-caixa-k8s-hibrido/tree/main/docs/figura2.png)
-![Figura 3 – racional consumo de pods DR ](https://github.com/paulohenriquelyra/fluxo-caixa-k8s-hibrido/tree/main/docs/figura3.png)
+![Figura 2 – racional consumo de pods](https://github.com/paulohenriquelyra/fluxo-caixa-k8s-hibrido/blob/main/docs/figura2.png)
+![Figura 3 – racional consumo de pods DR ](https://github.com/paulohenriquelyra/fluxo-caixa-k8s-hibrido/blob/main/docs/figura3.png)
 
 
 #### Cálculo do Número de Worker Nodes por Ambiente
@@ -376,24 +376,24 @@ A aplicação de FinOps e governança resulta em uma solução eficiente, segura
 
 ### DC On Premises XPTO
 
-![Figura 4 - Topologia DC On-premises](https://github.com/paulohenriquelyra/fluxo-caixa-k8s-hibrido/tree/main/diagrams/diagrama-topologia-on-premises.png)
+![Figura 4 - Topologia DC On-premises](https://github.com/paulohenriquelyra/fluxo-caixa-k8s-hibrido/blob/main/diagrams/diagrama-topologia-on-premises.
 
 
 ### CLOUD CENÁRIO DC XPTO <-> AWS
 
-![Figura 5 - VPC AWS](https://github.com/paulohenriquelyra/fluxo-caixa-k8s-hibrido/tree/main/diagrams/vpc-aws.png)
-![Figura 6 - Integracão DC AWS](https://github.com/paulohenriquelyra/fluxo-caixa-k8s-hibrido/tree/main/diagrams/integracao-dc-aws.png)
+![Figura 5 - VPC AWS](https://github.com/paulohenriquelyra/fluxo-caixa-k8s-hibrido/blob/main/diagrams/vpc-aws.png)
+![Figura 6 - Integracão DC AWS](https://github.com/paulohenriquelyra/fluxo-caixa-k8s-hibrido/blob/main/diagrams/integracao-dc-aws.png)
 
 
 ### CLOUD CENÁRIO DC XPTO <–> AZURE ARC
 
-![Figura 7 - Integracao DC Azure ARC 1a](https://github.com/paulohenriquelyra/fluxo-caixa-k8s-hibrido/tree/main/diagrams/integracao-dc-azure-1a.png)
+![Figura 7 - Integracao DC Azure ARC 1a](https://github.com/paulohenriquelyra/fluxo-caixa-k8s-hibrido/blob/main/diagrams/integracao-dc-azure-1a.png)
 
-![Figura 8 - Integracao DC Azure ARC 1b](https://github.com/paulohenriquelyra/fluxo-caixa-k8s-hibrido/tree/main/diagrams/integracao-dc-azure-1b.png)
+![Figura 8 - Integracao DC Azure ARC 1b](https://github.com/paulohenriquelyra/fluxo-caixa-k8s-hibrido/blob/main/diagrams/integracao-dc-azure-1b.png)
 
 ### Fluxo de Comunicação
 
-![Figura 9 - Macro Fluxo comunicação aplicação](https://github.com/paulohenriquelyra/fluxo-caixa-k8s-hibrido/tree/main/diagrams/macro-fluxo-aplicacao.png)
+![Figura 9 - Macro Fluxo comunicação aplicação](https://github.com/paulohenriquelyra/fluxo-caixa-k8s-hibrido/blob/main/diagrams/macro-fluxo-aplicacao.png)
 
 
 
