@@ -113,7 +113,7 @@ Desenvolver uma solução moderna, modular, e escalável para o sistema de fluxo
 - Volumetria estimada:
   - **Consumo Normal (Pico 14h-15h):** 550 RQS (500 Entradas/Saídas + 50 Consolidado), 200 TPS, 200 sessões simultâneas.
   - **Modo Campanha:** 1050 RQS (1000 Entradas/Saídas + 50 Consolidado), 400 TPS, 400 sessões simultâneas.
-  - **Outros** Tempo médio por sessão de 15 minutos com 20 lançamentos por sessão.
+
 ### Sizing do Banco de Dados
 
 - Lançamento típico de fluxo de caixa: ~3 KB por lançamento (com margem de 1 KB adicional).
@@ -199,13 +199,13 @@ Desenvolver uma solução moderna, modular, e escalável para o sistema de fluxo
 - **Cenário DR:**
   - 100% da carga em um ambiente: 1050 RQS, 400 TPS, 400 sessões.
 
-#### Capacidade dos Pods (cálculo detalhado no pdf em anexo)
+#### Capacidade dos Pods
 
 - **NGINX:** 120 RPS por pod.
-  - Normal: 5 pods <- 550 RQS / 120 RPS o qual é a capacidade estimada de atendimento do Pod NGINX no projeto.
+  - Normal: 5 pods.
   - Campanha: 9 pods.
 - **Node.js:** 20 TPS (60 RQS) por pod.
-  - Normal: 10 pods <- 200 TPS / 20 TPS que é a capacidade estimada de atendimento do Noje.js no projeto.
+  - Normal: 10 pods.
   - Campanha: 20 pods.
 - **Redis:** 1 pod (256Mi–512Mi RAM).
 - **Prometheus:** 1–2 pods (200m–400m CPU, 400Mi–800Mi RAM).
@@ -216,27 +216,18 @@ Desenvolver uma solução moderna, modular, e escalável para o sistema de fluxo
 ![Figura 3 – racional consumo de pods DR ](https://github.com/paulohenriquelyra/fluxo-caixa-k8s-hibrido/blob/main/docs/figura-3.png)
 
 
-#### Cálculo do Número de Worker Nodes por Ambiente 
+#### Cálculo do Número de Worker Nodes por Ambiente
 
-### Distribuição em modo normal (Ambos os Ambientes Ativos)
-#### On-Premises (60%)
-- 3 nodes (12 vCPUs, 24 GB), autoscaling para 5 nodes em caso de falha na cloud.
-- Carga: 335 RQS, 120 TPS, 120 sessões
+- **Cenário DR (CPU):** 14,02 vCPUs → 5 nodes (20 vCPUs, 70,1% utilização).
+- **Cenário DR (Memória):** 19,28 GB → 4 nodes (32 GB, 60,3% utilização).
+- **Ajuste Final:** 5 nodes base, autoscaling para 7 nodes (28 vCPUs, 56 GB).
 
-#### Cloud (40%)
-- 2 nodes (8 vCPUs, 16 GB), autoscaling para 5 nodes em caso de falha no DC on-premises.
-- Carga: 215 RQS, 80 TPS, 80 sessões
+#### Ajuste Final
 
-
-### Distribuição em modo campanha (Ambos os Ambientes Ativos)
-#### On-Premises (60%)
-- 4 nodes (16 vCPUs, 32 GB), autoscaling para 7 nodes em caso de falha na cloud.
-- Carga: 630 RQS, 240 TPS, 240 sessões
-
-#### Cloud (40%)
-- 3 nodes (12 vCPUs, 24 GB), autoscaling para 7 nodes em caso de falha no DC on-premises.
-- Carga: 420 RQS, 160 TPS, 160 sessões
-
+- Cada ambiente: 5 nodes (20 vCPUs, 40 GB), autoscaling para 7 nodes.
+- **Após Autoscaling (7 nodes):**
+  - CPU: 50,1% (~49,9% ocioso).
+  - Memória: 34,4% (~65,6% ocioso).
 
 ---
 
@@ -447,11 +438,10 @@ A aplicação de FinOps e governança resulta em uma solução eficiente, segura
 - **Custo e Controle:** 60% on-premises reduz custos.
 - **Escalabilidade e Resiliência:** 40% na nuvem para picos e continuidade.
 
-#### Cenário 1: Datacenter Local + Azure Arc com Azure SQL Managed Instance e Kubernetes com AKS
+#### Cenário 1: Datacenter Local + Azure Arc com Azure SQL Managed Instance
 
 - **Gerenciamento:** Azure Arc centraliza governança.
 - **Azure SQL MI:** Réplica na nuvem com backups automáticos.
-- **AKS** Hospeda 40% da carga com auto scaling.
 - **Segurança:** Integração com AAD (SSO).
 - **Vantagens:** Simplicidade e alta disponibilidade.
 
