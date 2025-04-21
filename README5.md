@@ -559,37 +559,35 @@ Observabilidade é sustentada por três pilares principais, que já foram parcia
         -	Backend de Tracing: Usar Jaeger ou Elastic APM (integrado ao ELK) para armazenar e visualizar traces.
         -	Benefício: Tracing permite identificar gargalos (ex.: uma query lenta no MS SQL Server) e rastrear falhas em requisições distribuídas, como uma entrada que falha ao ser processada.
 
-### ABORDAGENS COMPLEMENTARES
+
+### FERRAMENTAS COMPLEMENTARES
 
 Além de Grafana, Prometheus, ELK e OpenTelemetry/Jaeger, podemos adicionar:
-
-- Loki (para Logs): 
-       -	Uma alternativa leve ao ELK, Loki é otimizado para logs em ambientes Kubernetes. Ele se integra ao Grafana, permitindo correlacionar logs e métricas em um único painel.
+    -	Loki (para Logs): 
+        -	Uma alternativa leve ao ELK, Loki é otimizado para logs em ambientes Kubernetes. Ele se integra ao Grafana, permitindo correlacionar logs e métricas em um único painel.
         -	Exemplo: Loki coleta logs do NGINX e Node.js, e Grafana exibe um gráfico de latência HTTP ao lado de logs de erros, facilitando a análise.
-- AWS X-Ray (no Cenário AWS): 
+    -	AWS X-Ray (no Cenário AWS): 
         -	No cenário AWS, o X-Ray pode ser usado para tracing distribuído, complementando o OpenTelemetry. Ele rastreia requisições entre o EKS, EC2 e outros serviços AWS.
         -	Exemplo: X-Ray mostra que uma requisição ao MS SQL em EC2 está lenta devido a bloqueios de transação, visível em um mapa de serviço.
-- Azure Monitor (no Cenário Azure): 
+    -	Azure Monitor (no Cenário Azure): 
         -	No cenário Azure, o Azure Monitor coleta métricas e logs do AKS e do Azure SQL MI, integrando-se ao Grafana   para uma visão unificada.
         -	Exemplo: Azure Monitor detecta um pico de latência no SQL MI, correlacionado com métricas de rede no Grafana.
 
+### CENÁRIOS
 
-Especificidades por Cenário
-
-- **Cenário 1: Datacenter Local + Azure Arc + Azure SQL Managed Instance:** 
+Cenário 1: Datacenter Local + Azure Arc + Azure SQL Managed Instance 
     -	Métricas: Prometheus e Azure Monitor coletam métricas do AKS e do SQL MI (ex.: tempo de queries, conexões TCP). Grafana exibe essas métricas em dashboards, permitindo correlacionar latência de rede com desempenho do banco.
     -	Logs: ELK centraliza logs, e o Azure Monitor adiciona logs de diagnóstico do SQL MI, visíveis no Kibana.
     -	Tracing: OpenTelemetry instrumenta os microsserviços no AKS, e os traces são armazenados no Jaeger, 
     mostrando  fluxo completo de uma requisição (ex.: NGINX → Node.js → SQL MI).
     -	Vantagem: A integração nativa com Azure Monitor e a facilidade de configuração de tracing no AKS tornam a observabilidade mais simples e centralizada.
-- **Cenário 2: Datacenter Local + AWS + MS SQL em EC2:** 
+Cenário 2: Datacenter Local + AWS + MS SQL em EC2 
     -	Métricas: Prometheus coleta métricas do EKS e do EC2 (via SQL Exporter), complementado por métricas do Amazon CloudWatch. Grafana exibe tudo em dashboards unificados.
     -	Logs: ELK centraliza logs, e o AWS CloudWatch Logs adiciona logs do EC2, que podem ser exportados para o Elasticsearch.
     -	Tracing: OpenTelemetry com AWS X-Ray rastreia requisições no EKS, mostrando gargalos (ex.: latência entre Node.js e EC2).
     -	Vantagem: AWS X-Ray oferece uma visão detalhada do tráfego entre serviços AWS, mas a configuração de tracing e exportação de logs exige mais esforço.
-
 ### BENEFÍCIOS PARA SEGURANÇA E EFICIÊNCIA
-- **Segurança:** 
+Segurança: 
     -	Tracing (OpenTelemetry/Jaeger) ajuda a identificar requisições suspeitas (ex.: tempos de resposta anormais que podem indicar ataques).
     -	Logs (ELK/Loki) correlacionados com métricas (Prometheus) detectam padrões de ataque (ex.: aumento de erros 403 com IPs suspeitos).
     -	Eficiência: 
