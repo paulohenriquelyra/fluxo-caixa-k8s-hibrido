@@ -532,7 +532,7 @@ Especificidades por Cenário
       - VPC Flow Logs ajudam a identificar tráfego suspeito (ex.: IPs fora das regras de Security Groups), com alertas configurados no Prometheus.
 	- ***Eficiência:*** 
       - Grafana exibe métricas de latência entre o datacenter e o EKS, permitindo ajustes no AWS ALB para melhorar o desempenho.
-      
+
 ![Figura 6 – racional consumo de pods DR ](https://github.com/paulohenriquelyra/fluxo-caixa-k8s-hibrido/blob/main/docs/figura-6.png)
 
 Grafana, Prometheus e ferramentas complementares (como Azure Network Watcher e AWS VPC Flow Logs) permitem monitorar eventos de rede em todas as camadas do Modelo OSI, garantindo segurança (detecção de tráfego suspeito, validação de criptografia) e eficiência (otimização de latência e roteamento). No cenário Azure, a integração nativa com ferramentas como Network Watcher simplifica o monitoramento e ajustes, enquanto no cenário AWS, VPC Flow Logs e CloudWatch oferecem flexibilidade, mas exigem mais configuração. Ambas as abordagens protegem a aplicação de fluxo de caixa e otimizam o tráfego, com o Azure se destacando pela facilidade e o AWS pela personalização.
@@ -565,15 +565,15 @@ Observabilidade é sustentada por três pilares principais, que já foram parcia
 
 Além de Grafana, Prometheus, ELK e OpenTelemetry/Jaeger, podemos adicionar:
 
-- Loki (para Logs): 
-      -	Uma alternativa leve ao ELK, Loki é otimizado para logs em ambientes Kubernetes. Ele se integra ao Grafana, permitindo correlacionar logs e métricas em um único painel.
-      -	Exemplo: Loki coleta logs do NGINX e Node.js, e Grafana exibe um gráfico de latência HTTP ao lado de logs de erros, facilitando a análise.
-- AWS X-Ray (no Cenário AWS): 
-      -	No cenário AWS, o X-Ray pode ser usado para tracing distribuído, complementando o OpenTelemetry. Ele rastreia requisições entre o EKS, EC2 e outros serviços AWS.
-      -	Exemplo: X-Ray mostra que uma requisição ao MS SQL em EC2 está lenta devido a bloqueios de transação, visível em um mapa de serviço.
-- Azure Monitor (no Cenário Azure): 
-      -	No cenário Azure, o Azure Monitor coleta métricas e logs do AKS e do Azure SQL MI, integrando-se ao Grafana   para uma visão unificada.
-      -	Exemplo: Azure Monitor detecta um pico de latência no SQL MI, correlacionado com métricas de rede no Grafana.
+- **Loki (para Logs):** 
+  -	Uma alternativa leve ao ELK, Loki é otimizado para logs em ambientes Kubernetes. Ele se integra ao Grafana, permitindo correlacionar logs e métricas em um único painel.
+  -	Exemplo: Loki coleta logs do NGINX e Node.js, e Grafana exibe um gráfico de latência HTTP ao lado de logs de erros, facilitando a análise.
+- **AWS X-Ray (no Cenário AWS):** 
+  -	No cenário AWS, o X-Ray pode ser usado para tracing distribuído, complementando o OpenTelemetry. Ele rastreia requisições entre o EKS, EC2 e outros serviços AWS.
+  -	Exemplo: X-Ray mostra que uma requisição ao MS SQL em EC2 está lenta devido a bloqueios de transação, visível em um mapa de serviço.
+- **Azure Monitor (no Cenário Azure):** 
+  -	No cenário Azure, o Azure Monitor coleta métricas e logs do AKS e do Azure SQL MI, integrando-se ao Grafana   para uma visão unificada.
+  -	Exemplo: Azure Monitor detecta um pico de latência no SQL MI, correlacionado com métricas de rede no Grafana.
 
 
 Especificidades por Cenário
