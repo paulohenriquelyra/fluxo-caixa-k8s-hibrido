@@ -500,7 +500,7 @@ A aplicação de FinOps e governança resulta em uma solução eficiente, segura
     -	Segurança: Detecta padrões de tráfego anormais (ex.: aumento de requisições suspeitas), correlacionando com logs no ELK para análise detalhada.
     -	Exemplo: Grafana mostra um pico de erros 403, indicando falhas de autorização, que podem ser investigadas via logs no Kibana.
 
- ### ABORDAGENS COMPLEMENTARE
+ ### ABORDAGENS COMPLEMENTARES
 
 Além do Modelo OSI, podemos adotar abordagens complementares para monitoramento de rede:
 - **Análise de Fluxo de Rede (NetFlow/IPFIX):** 
@@ -538,20 +538,20 @@ Grafana, Prometheus e ferramentas complementares (como Azure Network Watcher e A
 ## OBSERVABILIDADE
 
 Observabilidade é sustentada por três pilares principais, que já foram parcialmente implementados na stack (Kubernetes, NGINX, Node.js, Redis, ELK, Grafana, Prometheus). Vamos expandir e detalhar cada pilar:
--**Métricas (Prometheus e Grafana):** 
+- **Métricas (Prometheus e Grafana):** 
     -  	O que já temos: Prometheus coleta métricas (ex.: latência, erros HTTP, uso de CPU) e Grafana as visualiza em dashboards, cobrindo camadas do Modelo OSI (ex.: latência de rede na Camada 3, erros HTTP na Camada 7).
     -	Aprimoramento: 
         -	Métricas Customizadas nos Microsserviços: No Node.js, usar bibliotecas como prom-client para criar métricas específicas da aplicação (ex.: tempo de processamento de uma entrada no fluxo de caixa). 
         -	Métricas de Banco de Dados: Usar Prometheus SQL Exporter para coletar métricas detalhadas do MS SQL Server (ex.: tempo médio de queries, bloqueios de transação), tanto no datacenter quanto na Azure SQL MI ou EC2.
         -	Dashboards Avançados: Criar dashboards no Grafana com alertas baseados em thresholds (ex.: latência de API > 500ms), correlacionando métricas de diferentes camadas (rede, aplicação, banco).
--**Logs (ELK):** 
+- **Logs (ELK):** 
     -	O que já temos: O ELK (Elasticsearch, Logstash, Kibana) centraliza logs de NGINX, Node.js, Redis e MS SQL Server, permitindo análise de eventos de autenticação e erros.
     -	Aprimoramento: 
         -	Logs Estruturados: Padronizar logs no formato JSON em todos os componentes (ex.: NGINX, Node.js), facilitando a busca e análise no Kibana. 
         -	Correlação com Contexto: Adicionar IDs de transação (correlation IDs) aos logs, permitindo rastrear uma requisição desde o NGINX até o Node.js, Redis e MS SQL Server. 
             -	Exemplo: Um correlation ID txn-123 é incluído no cabeçalho HTTP pelo NGINX e propagado para logs de todos os serviços, visível no Kibana.
         -	Análise de Segurança: Usar Kibana para criar visualizações que detectem padrões de ataque (ex.: múltiplas falhas de autenticação por IP), complementando a análise de rede feita com Prometheus.
--**Tracing (OpenTelemetry ou Jaeger):** 
+- **Tracing (OpenTelemetry ou Jaeger):** 
     -	O que falta: Atualmente, a stack não inclui tracing distribuído, essencial para entender o fluxo de requisições em um sistema de microsserviços.
     -	Aprimoramento: 
         -	Implementar OpenTelemetry: Instrumentar o NGINX, Node.js e conexões com Redis e MS SQL Server para gerar traces. 
