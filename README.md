@@ -3,7 +3,7 @@
 ## Sistemas de Fluxo de Caixa Empresa XPTO – FLCX (Ver 1.0)
 
 **Autor:** Paulo Lyra ([Paulo.lyra@gmail.com](mailto:Paulo.lyra@gmail.com))
-**Documento**  Projeto_Desafio_VERX_XPTO completo em PDF no diretório raiz  
+**Documento**  Projeto_Desafio_VERX_XPTO_3 completo em PDF no diretório raiz  
 
 
 ---
@@ -936,7 +936,7 @@ Disaster Recovery (DR) em cenários de datacenter local integrado com Azure e co
  - RPO (Recovery Point Objective): Quantidade máxima de dados perdida, medida pelo tempo entre o último backup ou réplica e a falha. Em um sistema financeiro, onde cada transação é crucial, o RPO deve ser próximo de zero (ex.: segundos ou, no máximo, poucos minutos).
 
 - **CENÁRIO 1: DATACENTER LOCAL + AZURE ARC + AZURE SQL MANAGED INSTANCE:**
-   - ***RTO no Azure:** 
+   - ***RTO no Azure:***
         No cenário com Azure Arc e Azure SQL Managed Instance (MI), a recuperação é altamente otimizada:
         - Failover Automático: O SQL Managed Instance suporta grupos de disponibilidade (como Always On Availability Groups) com failover automático para uma réplica na nuvem, reduzindo o tempo de inatividade a 5-15 minutos.
         - Redirecionamento de Tráfego: O Azure Traffic Manager redireciona o tráfego para o cluster Kubernetes (AKS) na nuvem quase instantaneamente após o failover.
