@@ -41,7 +41,7 @@ Desenvolver uma solução moderna, modular, e escalável para o sistema de fluxo
 
 - Solução baseada em contêineres com Kubernetes, utilizando NGINX, Node.js, Redis, e SQL Server.
 - Arquitetura híbrida com:
-  - Workload normal: 60% DC Local + 40% Cloud (6 nodes DC + 4 nodes Cloud).
+  - Workload normal: 60% DC Local + 40% Cloud.
 - Conectividade via link dedicado DC-Cloud para maior segurança, baixa latência, e conformidade (LGPD, PCI-DSS).
 - Infraestrutura on-premises com cluster de virtualização (Hyper-V ou VMware).
 - Recursos existentes no DC: cluster ELK (3 VMs: 8 vCPUs, 32 GB RAM, 500 GB disco), Bastion Host (1 VM: 2 vCPUs, 8 GB RAM, 40 GB disco), e VM Helm (4 vCPUs, 8 GB RAM, 120 GB disco).
