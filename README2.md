@@ -104,6 +104,8 @@ Desenvolver uma solução moderna, modular, e escalável para o sistema de fluxo
 - Solução baseada em contêineres com Kubernetes, utilizando NGINX, Node.js, Redis, e SQL Server.
 - Arquitetura híbrida com:
   - Workload normal: 60% DC Local + 40% Cloud (6 nodes DC + 4 nodes Cloud).
+  - Workload DR (100% Cloud, Normal): 2 nodes base + 7 nodes autoscaling.
+  - Workload DR (100% Cloud, Campanha): 2 nodes base + 12 nodes autoscaling.
 - Conectividade via link dedicado DC-Cloud para maior segurança, baixa latência, e conformidade (LGPD, PCI-DSS).
 - Infraestrutura on-premises com cluster de virtualização (Hyper-V ou VMware).
 - Recursos existentes no DC: cluster ELK (3 VMs: 8 vCPUs, 32 GB RAM, 500 GB disco), Bastion Host (1 VM: 2 vCPUs, 8 GB RAM, 40 GB disco), e VM Helm (4 vCPUs, 8 GB RAM, 120 GB disco).
@@ -379,7 +381,7 @@ A gestão eficiente da infraestrutura híbrida combina práticas de FinOps e gov
 - Estratégia: Reserved Instances para cargas fixas, Spot Instances para tarefas não críticas.
 - Impacto: Custos otimizados e flexibilidade.
 
-#### Uso Estratégico de Serverless envolvendo automações
+#### Uso Estratégico de Serverless
 
 - Datacenter Local: Ansible, Jenkins.
 - Azure: Azure Functions.
@@ -439,168 +441,24 @@ A aplicação de FinOps e governança resulta em uma solução eficiente, segura
 
 ### DC On Premises XPTO
 
-![Diagrama 1 - Topologia DC On-premises](https://github.com/paulohenriquelyra/fluxo-caixa-k8s-hibrido/blob/main/diagrams/diagrama-topologia-dc-on-premises.png) 
+![Figura 4 - Topologia DC On-premises](https://github.com/paulohenriquelyra/fluxo-caixa-k8s-hibrido/blob/main/diagrams/diagrama-topologia-dc-on-premises.png) 
 
 
 ### CLOUD CENÁRIO DC XPTO <-> AWS
 
-![Diagrama 2 - VPC AWS](https://github.com/paulohenriquelyra/fluxo-caixa-k8s-hibrido/blob/main/diagrams/vpc-aws.png)
-![Diagrama 3 - Integracão DC AWS](https://github.com/paulohenriquelyra/fluxo-caixa-k8s-hibrido/blob/main/diagrams/integracao-dc-aws.png)
+![Figura 5 - VPC AWS](https://github.com/paulohenriquelyra/fluxo-caixa-k8s-hibrido/blob/main/diagrams/vpc-aws.png)
+![Figura 6 - Integracão DC AWS](https://github.com/paulohenriquelyra/fluxo-caixa-k8s-hibrido/blob/main/diagrams/integracao-dc-aws.png)
 
 
 ### CLOUD CENÁRIO DC XPTO <–> AZURE ARC
 
-![Diagrama 4 - Integracao DC Azure ARC 1a](https://github.com/paulohenriquelyra/fluxo-caixa-k8s-hibrido/blob/main/diagrams/integracao-dc-azure-1a.png)
+![Figura 7 - Integracao DC Azure ARC 1a](https://github.com/paulohenriquelyra/fluxo-caixa-k8s-hibrido/blob/main/diagrams/integracao-dc-azure-1a.png)
 
-![Diagrama 5 - Integracao DC Azure ARC 1b](https://github.com/paulohenriquelyra/fluxo-caixa-k8s-hibrido/blob/main/diagrams/integracao-dc-azure-1b.png)
+![Figura 8 - Integracao DC Azure ARC 1b](https://github.com/paulohenriquelyra/fluxo-caixa-k8s-hibrido/blob/main/diagrams/integracao-dc-azure-1b.png)
 
 ### Fluxo de Comunicação
 
-![Diagrama 6 - Macro Fluxo comunicação aplicação](https://github.com/paulohenriquelyra/fluxo-caixa-k8s-hibrido/blob/main/diagrams/macro-fluxo-aplicacao.png)
-
-
-### MONITORAÇÃO E OBSERVABILIDADE
-
-## MONITORAÇÃO OSI
-
- - **Camada 1 – Física (Conexões Físicas):** 
-    - 	Ferramenta: Prometheus com Node Exporter.
-    - 	Monitoramento: O Node Exporter coleta métricas de hardware (ex.: taxa de erros de pacotes, latência de interface de rede) nos nós do Kubernetes (datacenter e nuvem).
-    -	Exemplo: Um pico de erros na interface de rede pode indicar falhas físicas (ex.: cabos ou switches). Grafana exibe essas métricas em um dashboard, permitindo ação rápida para evitar quedas.
- - **Camada 2 – Enlace (Switches, VLANs):** 
-    -	Ferramenta: Prometheus com SNMP Exporter.
-    -	Monitoramento: Monitora switches e VLANs usados para segmentar o tráfego entre namespaces (proxy e app). Métricas como colisões de pacotes ou erros de frame são coletadas via SNMP.
-    -	Exemplo: Um aumento de colisões pode indicar problemas de configuração no datacenter local ou na VPC (AWS). Grafana alerta a equipe para corrigir a segmentação.
-- **Camada 3 – Rede (IP, Roteamento):** 
-    -	Ferramenta: Prometheus com Blackbox Exporter.
-    -	Monitoramento: Verifica a conectividade IP entre componentes (ex.: NGINX → Node.js, Node.js → SQL). Métricas como latência de pacotes, perda de pacotes e tempo de resposta são coletadas.
-    -	Segurança: Detecta tentativas de acesso não autorizado (ex.: IPs fora do permitido pelas Network Policies).
-    -	Exemplo: Um aumento na perda de pacotes entre o datacenter e o Azure pode indicar problemas de roteamento, visíveis em um dashboard Grafana, permitindo ajustes no Azure Traffic Manager.
-- **Camada 4 – Transporte (TCP/UDP):** 
-    -	Ferramenta: Prometheus com Node Exporter e NGINX Prometheus Exporter.
-    -	Monitoramento: Métricas como conexões TCP ativas, retransmissões e timeouts são coletadas para portas específicas (ex.: 443 para HTTPS, 6379 para Redis, 1433 para SQL).
-    -   Eficiência: Retransmissões altas podem indicar congestionamento, afetando o desempenho.
-    -	Segurança: Um número anormal de conexões TCP pode sugerir um ataque DDoS, que pode ser correlacionado com logs do ELK.
-    -	Exemplo: Grafana mostra um pico de retransmissões na porta 443 entre NGINX e Node.js, indicando problemas de rede que podem ser mitigados ajustando configurações de TCP.
-- **Camada 5 – Sessão (Gerenciamento de Sessões):**  
-    -   Ferramenta: ELK (Elastic Stack).
-    -	Monitoramento: Logs do NGINX (namespace proxy) registram detalhes de sessões (ex.: duração, falhas de autenticação).
-    -	Segurança: Detecta tentativas de hijacking de sessão ou falhas repetidas de autenticação (ex.: tokens JWT inválidos).
-    -	Exemplo: Kibana exibe um aumento de falhas de autenticação, sugerindo um ataque de força bruta, permitindo bloqueio proativo de IPs suspeitos.
-- **Camada 6 – Apresentação (Criptografia, Formato):** 
-    -   Ferramenta: Prometheus com Blackbox Exporter e Grafana.
-    -	Monitoramento: Verifica a integridade do TLS (ex.: certificados expirados, falhas de handshake).
-    -	Segurança: Garante que o tráfego HTTPS (NGINX → Usuários, NGINX → Node.js com mTLS) e TLS (Node.js → SQL) esteja funcionando corretamente.
-    -	Exemplo: Um alerta no Grafana indica que um certificado está prestes a expirar, permitindo renovação via cert-manager antes de falhas.
-
-- **Camada 7 – Aplicação (HTTP, APIs):** 
-    -	Ferramenta: Prometheus com NGINX Prometheus Exporter e Grafana.
-    -	Monitoramento: Métricas de requisições HTTP (ex.: taxas de erro 5xx, latência de APIs REST).
-    -	Eficiência: Identifica gargalos em endpoints críticos (ex.: /entradas no Node.js).
-    -	Segurança: Detecta padrões de tráfego anormais (ex.: aumento de requisições suspeitas), correlacionando com logs no ELK para análise detalhada.
-    -	Exemplo: Grafana mostra um pico de erros 403, indicando falhas de autorização, que podem ser investigadas via logs no Kibana.
-
- ### ABORDAGENS COMPLEMENTARE
-
-Além do Modelo OSI, podemos adotar abordagens complementares para monitoramento de rede:
-- **Análise de Fluxo de Rede (NetFlow/IPFIX):** 
-    -	Ferramenta: ntopng ou AWS VPC Flow Logs (no cenário AWS).
-    -	Monitoramento: Registra fluxos de tráfego entre componentes (ex.: datacenter → AKS/EKS).
-    -	Segurança: Identifica tráfego suspeito (ex.: portas não autorizadas).
-    -	Eficiência: Ajuda a otimizar rotas de tráfego entre o datacenter e a nuvem.
-- **Monitoramento de Segurança (WAF e IDS):**  
-    -	Ferramenta: AWS WAF (AWS) ou Azure Application Gateway com WAF (Azure).
-    -	Monitoramento: Analisa tráfego na camada 7 para detectar ataques (ex.: SQL injection, XSS).
-    -	Segurança: Bloqueia requisições maliciosas antes que cheguem ao NGINX.
-
-Especificidades por Cenário
-	
-- **CENÁRIO 1: DATACENTER LOCAL + AZURE ARC + AZURE SQL MANAGED INSTANCE**
-	Monitoramento de Rede: 
-        - Azure Network Watcher: Complementa o Prometheus/Grafana, fornecendo diagnóstico de rede (ex.: latência entre datacenter e AKS).
-	    -  Azure Monitor: Integra-se com Grafana para exibir métricas de rede do SQL MI (ex.: conexões TCP na porta 1433).
-	Segurança: 
-        - Network Watcher pode detectar tráfego não autorizado entre o datacenter e o Azure, correlacionando com logs no ELK.
-	Eficiência: 
-        - Dashboards no Grafana mostram latência de rede entre o datacenter e o AKS, permitindo ajustes no Azure Traffic Manager para otimizar o tráfego.
-
-- **CENÁRIO 2: DATACENTER LOCAL + AWS + MS SQL EM EC2**
-	Monitoramento de Rede: 
-        - AWS VPC Flow Logs: Registra fluxos de tráfego entre o datacenter e o EKS, integrando com Prometheus/Grafana via exportadores.
-        - Amazon CloudWatch: Fornece métricas de rede (ex.: latência de pacotes), que podem ser visualizadas no Grafana.
-	Segurança: 
-        - VPC Flow Logs ajudam a identificar tráfego suspeito (ex.: IPs fora das regras de Security Groups), com alertas configurados no Prometheus.
-	Eficiência: 
-        - Grafana exibe métricas de latência entre o datacenter e o EKS, permitindo ajustes no AWS ALB para melhorar o desempenho.
-
-Grafana, Prometheus e ferramentas complementares (como Azure Network Watcher e AWS VPC Flow Logs) permitem monitorar eventos de rede em todas as camadas do Modelo OSI, garantindo segurança (detecção de tráfego suspeito, validação de criptografia) e eficiência (otimização de latência e roteamento). No cenário Azure, a integração nativa com ferramentas como Network Watcher simplifica o monitoramento e ajustes, enquanto no cenário AWS, VPC Flow Logs e CloudWatch oferecem flexibilidade, mas exigem mais configuração. Ambas as abordagens protegem a aplicação de fluxo de caixa e otimizam o tráfego, com o Azure se destacando pela facilidade e o AWS pela personalização.
-
-## OBSERVABILIDADE
-
-Observabilidade é sustentada por três pilares principais, que já foram parcialmente implementados na stack (Kubernetes, NGINX, Node.js, Redis, ELK, Grafana, Prometheus). Vamos expandir e detalhar cada pilar:
--**Métricas (Prometheus e Grafana):** 
-    -  	O que já temos: Prometheus coleta métricas (ex.: latência, erros HTTP, uso de CPU) e Grafana as visualiza em dashboards, cobrindo camadas do Modelo OSI (ex.: latência de rede na Camada 3, erros HTTP na Camada 7).
-    -	Aprimoramento: 
-        -	Métricas Customizadas nos Microsserviços: No Node.js, usar bibliotecas como prom-client para criar métricas específicas da aplicação (ex.: tempo de processamento de uma entrada no fluxo de caixa). 
-        -	Métricas de Banco de Dados: Usar Prometheus SQL Exporter para coletar métricas detalhadas do MS SQL Server (ex.: tempo médio de queries, bloqueios de transação), tanto no datacenter quanto na Azure SQL MI ou EC2.
-        -	Dashboards Avançados: Criar dashboards no Grafana com alertas baseados em thresholds (ex.: latência de API > 500ms), correlacionando métricas de diferentes camadas (rede, aplicação, banco).
--**Logs (ELK):** 
-    -	O que já temos: O ELK (Elasticsearch, Logstash, Kibana) centraliza logs de NGINX, Node.js, Redis e MS SQL Server, permitindo análise de eventos de autenticação e erros.
-    -	Aprimoramento: 
-        -	Logs Estruturados: Padronizar logs no formato JSON em todos os componentes (ex.: NGINX, Node.js), facilitando a busca e análise no Kibana. 
-        -	Correlação com Contexto: Adicionar IDs de transação (correlation IDs) aos logs, permitindo rastrear uma requisição desde o NGINX até o Node.js, Redis e MS SQL Server. 
-            -	Exemplo: Um correlation ID txn-123 é incluído no cabeçalho HTTP pelo NGINX e propagado para logs de todos os serviços, visível no Kibana.
-        -	Análise de Segurança: Usar Kibana para criar visualizações que detectem padrões de ataque (ex.: múltiplas falhas de autenticação por IP), complementando a análise de rede feita com Prometheus.
--**Tracing (OpenTelemetry ou Jaeger):** 
-    -	O que falta: Atualmente, a stack não inclui tracing distribuído, essencial para entender o fluxo de requisições em um sistema de microsserviços.
-    -	Aprimoramento: 
-        -	Implementar OpenTelemetry: Instrumentar o NGINX, Node.js e conexões com Redis e MS SQL Server para gerar traces. 
-        -	No Node.js, usar a biblioteca @opentelemetry para capturar spans: 
-        -	Backend de Tracing: Usar Jaeger ou Elastic APM (integrado ao ELK) para armazenar e visualizar traces.
-        -	Benefício: Tracing permite identificar gargalos (ex.: uma query lenta no MS SQL Server) e rastrear falhas em requisições distribuídas, como uma entrada que falha ao ser processada.
-
-
-### FERRAMENTAS COMPLEMENTARES
-
-Além de Grafana, Prometheus, ELK e OpenTelemetry/Jaeger, podemos adicionar:
-    -	Loki (para Logs): 
-        -	Uma alternativa leve ao ELK, Loki é otimizado para logs em ambientes Kubernetes. Ele se integra ao Grafana, permitindo correlacionar logs e métricas em um único painel.
-        -	Exemplo: Loki coleta logs do NGINX e Node.js, e Grafana exibe um gráfico de latência HTTP ao lado de logs de erros, facilitando a análise.
-    -	AWS X-Ray (no Cenário AWS): 
-        -	No cenário AWS, o X-Ray pode ser usado para tracing distribuído, complementando o OpenTelemetry. Ele rastreia requisições entre o EKS, EC2 e outros serviços AWS.
-        -	Exemplo: X-Ray mostra que uma requisição ao MS SQL em EC2 está lenta devido a bloqueios de transação, visível em um mapa de serviço.
-    -	Azure Monitor (no Cenário Azure): 
-        -	No cenário Azure, o Azure Monitor coleta métricas e logs do AKS e do Azure SQL MI, integrando-se ao Grafana   para uma visão unificada.
-        -	Exemplo: Azure Monitor detecta um pico de latência no SQL MI, correlacionado com métricas de rede no Grafana.
-
-### CENÁRIOS
-
-Cenário 1: Datacenter Local + Azure Arc + Azure SQL Managed Instance 
-    -	Métricas: Prometheus e Azure Monitor coletam métricas do AKS e do SQL MI (ex.: tempo de queries, conexões TCP). Grafana exibe essas métricas em dashboards, permitindo correlacionar latência de rede com desempenho do banco.
-    -	Logs: ELK centraliza logs, e o Azure Monitor adiciona logs de diagnóstico do SQL MI, visíveis no Kibana.
-    -	Tracing: OpenTelemetry instrumenta os microsserviços no AKS, e os traces são armazenados no Jaeger, 
-    mostrando  fluxo completo de uma requisição (ex.: NGINX → Node.js → SQL MI).
-    -	Vantagem: A integração nativa com Azure Monitor e a facilidade de configuração de tracing no AKS tornam a observabilidade mais simples e centralizada.
-Cenário 2: Datacenter Local + AWS + MS SQL em EC2 
-    -	Métricas: Prometheus coleta métricas do EKS e do EC2 (via SQL Exporter), complementado por métricas do Amazon CloudWatch. Grafana exibe tudo em dashboards unificados.
-    -	Logs: ELK centraliza logs, e o AWS CloudWatch Logs adiciona logs do EC2, que podem ser exportados para o Elasticsearch.
-    -	Tracing: OpenTelemetry com AWS X-Ray rastreia requisições no EKS, mostrando gargalos (ex.: latência entre Node.js e EC2).
-    -	Vantagem: AWS X-Ray oferece uma visão detalhada do tráfego entre serviços AWS, mas a configuração de tracing e exportação de logs exige mais esforço.
-### BENEFÍCIOS PARA SEGURANÇA E EFICIÊNCIA
-Segurança: 
-    -	Tracing (OpenTelemetry/Jaeger) ajuda a identificar requisições suspeitas (ex.: tempos de resposta anormais que podem indicar ataques).
-    -	Logs (ELK/Loki) correlacionados com métricas (Prometheus) detectam padrões de ataque (ex.: aumento de erros 403 com IPs suspeitos).
-    -	Eficiência: 
-    -	Métricas e traces identificam gargalos (ex.: latência alta no Redis ou no SQL), permitindo ajustes (ex.: aumentar réplicas do Redis).
-    -	Dashboards unificados no Grafana mostram o impacto de mudanças (ex.: latência reduzida após otimizar Network Policies).
-
-![Figura 7 – racional consumo de pods DR ](https://github.com/paulohenriquelyra/fluxo-caixa-k8s-hibrido/blob/main/docs/figura-7.png)
-
-Conclusão
-A observabilidade é ampliada com métricas (Prometheus/Grafana), logs (ELK/Loki) e tracing (OpenTelemetry/Jaeger ou AWS X-Ray), proporcionando uma visão completa do sistema em ambos os cenários. No Azure, a integração nativa com Azure Monitor facilita a implementação, enquanto no AWS, ferramentas como X-Ray e CloudWatch oferecem flexibilidade, mas com maior esforço de configuração. Essa abordagem garante segurança (detecção de anomalias), eficiência (otimização de desempenho) e resiliência (diagnóstico rápido de falhas), essencial para uma aplicação crítica como fluxo de caixa em um ambiente híbrido.
- 
-
-
+![Figura 9 - Macro Fluxo comunicação aplicação](https://github.com/paulohenriquelyra/fluxo-caixa-k8s-hibrido/blob/main/diagrams/macro-fluxo-aplicacao.png)
 
 
 
@@ -673,8 +531,6 @@ A observabilidade é ampliada com métricas (Prometheus/Grafana), logs (ELK/Loki
 
 - **Cenário 1 (Azure Arc):** Integração simples com AAD, gerenciamento unificado.
 - **Cenário 2 (AWS):** Flexibilidade e controle total, para equipes experientes.
-
-A stack tecnológica foi adotada por oferecer escalabilidade (Kubernetes, Node.js, Redis), segurança (NGINX com mTLS, namespaces, RBAC), confiabilidade (MS SQL Server), visibilidade (ELK) e custo-benefício (workload híbrido). O Cenário 1 (Azure Arc) simplifica a gestão e melhora a resiliência com SQL Managed Instance, enquanto o Cenário 2 (AWS) dá mais controle com EKS e EC2, mas exige mais configuração. A escolha depende das prioridades da equipe, como facilidade operacional ou flexibilidade técnica
 
 ---
 
@@ -837,64 +693,6 @@ jobs:
 #### Conclusão GitHub
 
 A integração com GitHub e GitHub Actions completa o projeto, com um pipeline CI/CD automatizado que garante qualidade, segurança e eficiência nas implantações.
-
-##  AUTENTICAÇÃO E SEGURANÇA
-
-A autenticação e a segurança são fundamentais para proteger uma aplicação de fluxo de caixa, garantindo que apenas usuários autorizados acessem os serviços e que os dados financeiros permaneçam confidenciais e íntegros. A stack tecnológica utiliza componentes como um provedor de identidade central, NGINX como proxy seguro, namespaces (proxy, app) para isolamento, criptografia em todas as camadas e ferramentas de monitoramento para alcançar esses objetivos. A seguir, exploramos como esses elementos se aplicam aos cenários de integração entre um datacenter local e as nuvens Azure e AWS.
-
-![Figura 4 –Autenticação e Segurança](https://github.com/paulohenriquelyra/fluxo-caixa-k8s-hibrido/blob/main/docs/figura-4.png)
-
-Ambos os cenários – datacenter local integrado com Azure e com AWS – oferecem autenticação robusta e segurança avançada para a aplicação de fluxo de caixa, utilizando um provedor de identidade central, NGINX como proxy seguro, isolamento via namespaces, criptografia em todas as camadas e monitoramento contínuo. O cenário com Azure se destaca pela simplicidade e integração nativa com o AAD e o Azure Arc, sendo ideal para quem busca agilidade na implementação. Já o cenário com AWS oferece maior flexibilidade e controle por meio do AWS IAM e configurações manuais, atendendo a quem prefere personalização detalhada. A escolha depende das prioridades: simplicidade (Azure) ou customização (AWS).
-
-## DR 
-
-Disaster Recovery (DR) em cenários de datacenter local integrado com Azure e com AWS podem prover RTO (Recovery Time Objective) e RPO (Recovery Point Objective) adequados para uma aplicação crítica como fluxo de caixa.
- - RTO (Recovery Time Objective): Representa o tempo máximo que a aplicação pode ficar indisponível após uma falha antes de causar impactos. Para uma aplicação crítica como fluxo de caixa, que exige alta disponibilidade, o RTO ideal é muito baixo, na casa de minutos (ex.: 5 a 15 minutos). 
- - RPO (Recovery Point Objective): Quantidade máxima de dados perdida, medida pelo tempo entre o último backup ou réplica e a falha. Em um sistema financeiro, onde cada transação é crucial, o RPO deve ser próximo de zero (ex.: segundos ou, no máximo, poucos minutos).
-
-- CENÁRIO 1: DATACENTER LOCAL + AZURE ARC + AZURE SQL MANAGED INSTANCE
-   RTO no Azure 
-        No cenário com Azure Arc e Azure SQL Managed Instance (MI), a recuperação é altamente otimizada:
-           - Failover Automático: O SQL Managed Instance suporta grupos de disponibilidade (como Always On Availability Groups) com failover automático para uma réplica na nuvem, reduzindo o tempo de inatividade a 5-15 minutos.
- 	       - Redirecionamento de Tráfego: O Azure Traffic Manager redireciona o tráfego para o cluster Kubernetes (AKS) na nuvem quase instantaneamente após o failover.
-   	Vantagem: A automação nativa do Azure minimiza a intervenção humana, garantindo um RTO baixo e confiável.
-   RPO no Azure
- 	      - Replicação Assíncrona: A réplica no SQL MI é atualizada de forma assíncrona com um atraso mínimo (segundos a minutos), resultando em um RPO de até 5 minutos.
-      	  - Cache com Redis: Dados voláteis podem ser mantidos no Redis, mas para um RPO menor, é necessário configurar persistência (ex.: AOF ou RDB) para evitar perdas.
-          - Otimização: Ajustando a frequência da replicação ou usando backups frequentes, o RPO pode ser reduzido ainda mais.
- 
-
-- CENÁRIO 2: DATACENTER LOCAL + AWS + MS SQL EM EC2
-    RTO na AWS
-        No cenário com AWS e MS SQL Server rodando em instâncias EC2, o processo é menos automatizado:
-            - Failover Manual: A promoção da réplica no EC2 para o papel de master exige intervenção manual, o que aumenta o tempo de recuperação para 30-60 minutos.
-            - Redirecionamento de Tráfego: O AWS Application Load Balancer (ALB) redireciona o tráfego para o cluster EKS, mas o processo completo é mais lento devido à falta de automação nativa.
-            - Desvantagem: A dependência de ações manuais eleva o RTO, tornando-o menos ideal para uma aplicação crítica.
-
-    RPO na AWS
-        Replicação Assíncrona: Assim como no Azure, o uso de Always On Availability Groups em replicação assíncrona resulta em um RPO de até 5 minutos.
-            - Cache com Redis: Configurações de persistência no Redis são igualmente necessárias para minimizar perdas de dados.
-            - Risco: A falta de automação pode introduzir atrasos na sincronização, afetando a consistência do RPO.
-
-- Otimizações para uma Aplicação Crítica como Fluxo de Caixa
-    Para garantir que o RTO e o RPO atendam aos requisitos rigorosos de uma aplicação de fluxo de caixa, algumas melhorias podem ser implementadas em ambos os cenários:
-            - Automação Avançada: 
-            - Azure: Scripts ou políticas de failover automático já são nativos, mas podem ser refinados para reduzir o RTO para menos de 5 minutos.
-            - AWS: Configurar AWS Lambda ou ferramentas de automação para disparar o failover, diminuindo o RTO para algo próximo de 15-20 minutos.
-            - Replicação Síncrona: 
-            - Em ambos os cenários, adotar replicação síncrona (em vez de assíncrona) pode zerar o RPO, garantindo que nenhum dado seja perdido. Isso exige uma conexão de baixa latência e alta largura de banda entre o datacenter local e a nuvem, mas é viável para sistemas financeiros críticos.
-            - Backups Frequentes: 
-                - Azure: O SQL MI suporta backups automáticos com alta frequência (ex.: a cada 1-5 minutos).
-                - AWS: Snapshots frequentes no EC2 ou uso do AWS Backup podem reduzir o RPO para segundos.
-            - Testes Regulares: 
-                - Simulações de falhas devem ser realizadas periodicamente para validar os tempos de RTO e RPO e ajustar as configurações conforme necessário.
-
-Para uma aplicação crítica como fluxo de caixa, o cenário Datacenter Local + Azure Arc com Azure SQL Managed Instance é superior, oferecendo um RTO de 5-15 minutos e um RPO de até 5 minutos, com automação integrada e menor complexidade operacional. Já o cenário Datacenter Local + AWS com MS SQL em EC2 apresenta um RTO mais alto (30-60 minutos) devido à necessidade de intervenção manual, embora o RPO seja comparável (até 5 minutos).
-Para atender aos requisitos mais exigentes (RTO e RPO próximos de zero), recomenda-se implementar replicação síncrona e backups frequentes em ambos os casos, com o Azure se destacando pela facilidade de automação e gerenciamento. Assim, o Azure é a escolha mais robusta e ágil para garantir a continuidade de uma aplicação financeira essencial.
-utilizando Ansible, Terraform (ou AWS CloudFormation, se restrito a ferramentas AWS), podemos reduzir significativamente o RTO no cenário descrito para a AWS, chegando a 15-30 minutos. Isso envolve automatizar o failover do MS SQL Server, o redirecionamento de tráfego no EKS e a atualização das conexões dos microsserviços. Embora seja uma melhoria expressiva em relação ao processo manual, o Azure ainda seria mais rápido para aplicações críticas devido à sua automação nativa.
-
-
-![Figura 5 – Autenticação e Segurança](https://github.com/paulohenriquelyra/fluxo-caixa-k8s-hibrido/blob/main/docs/figura-5.png)
 
 ---
 
