@@ -95,8 +95,7 @@ Adotamos a capacidade do Node.js em **20 TPS por pod** (devido ao overhead de HT
   - Base: 5 worker nodes (4 vCPUs, 8 GB RAM cada).
   - Total por ambiente: 20 vCPUs, 40 GB RAM.
   - Autoscaling: Até 7 nodes (28 vCPUs, 56 GB).
-- **Total (Ambos os Ambientes):**
-  - 10 worker nodes (40 vCPUs, 80 GB RAM).
+
 - **Cenário DR:**
   - 5 nodes (20 vCPUs, 40 GB), autoscaling para 7 nodes (28 vCPUs, 56 GB) ou 10 nodes se considerar HA a nível de node.
 
