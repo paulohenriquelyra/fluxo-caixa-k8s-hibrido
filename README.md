@@ -77,7 +77,8 @@ Adotamos a capacidade do Node.js em **20 TPS por pod** (devido ao overhead de HT
 - Dimensionamento para suportar:
   - **Consumo Normal:** 550 RQS, 200 TPS, 200 sessões.
   - **Modo Campanha:** 1050 RQS, 400 TPS, 400 sessões.
-  - **Cenário DR:** 100% da carga em um ambiente, com ~75% de utilização (25% ocioso).
+  - **Cenário DR :** 100% da carga em um ambiente, com ~75% de utilização (25% ocioso).
+    - 550 RQS ->*** 1050 RQS em auto scalling.
 
 ---
 
