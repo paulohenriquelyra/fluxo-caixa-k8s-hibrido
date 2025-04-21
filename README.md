@@ -954,7 +954,7 @@ Disaster Recovery (DR) em cenários de datacenter local integrado com Azure e co
         - Redirecionamento de Tráfego: O AWS Application Load Balancer (ALB) redireciona o tráfego para o cluster EKS, mas o processo completo é mais lento devido à falta de automação nativa.
         - Desvantagem: A dependência de ações manuais eleva o RTO, tornando-o menos ideal para uma aplicação crítica.
 
-    - ***RPO na AWS:**
+    - ***RPO no AWS:***
         Replicação Assíncrona: Assim como no Azure, o uso de Always On Availability Groups em replicação assíncrona resulta em um RPO de até 5 minutos.
         - Cache com Redis: Configurações de persistência no Redis são igualmente necessárias para minimizar perdas de dados.
         - Risco: A falta de automação pode introduzir atrasos na sincronização, afetando a consistência do RPO.
@@ -1049,7 +1049,7 @@ A solução proposta é robusta, segura, economicamente eficiente, resiliente e 
 
 ### Sobre Paulo Lyra
 
-**Perfil:** Profissional sênior com + de 34 anos de experiência em TI e Telecomunicações, com atuação em empresas como iBest, Brasil Telecom, Oi e V.tal. 
+**Perfil:** Profissional sênior com + de 34 anos de experiência em TI e Telecomunicações, com atuação no Governo, RNP nos anos 90 e em empresas iBest, Brasil Telecom, Oi e V.tal nos últimos 22 anos.
 
 
 **Contatos:**
