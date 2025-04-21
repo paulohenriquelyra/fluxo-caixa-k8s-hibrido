@@ -961,16 +961,16 @@ Disaster Recovery (DR) em cenários de datacenter local integrado com Azure e co
 
 - **Otimizações para uma Aplicação Crítica como Fluxo de Caixa:**
     Para garantir que o RTO e o RPO atendam aos requisitos rigorosos de uma aplicação de fluxo de caixa, algumas melhorias podem ser implementadas em ambos os cenários:
-      - Automação Avançada: 
-      - Azure: Scripts ou políticas de failover automático já são nativos, mas podem ser refinados para reduzir o RTO para menos de 5 minutos.
-      - AWS: Configurar AWS Lambda ou ferramentas de automação para disparar o failover, diminuindo o RTO para algo próximo de 15-20 minutos.
-      - Replicação Síncrona: 
+    - Automação Avançada: 
+       - Azure: Scripts ou políticas de failover automático já são nativos, mas podem ser refinados para reduzir o RTO para menos de 5 minutos.
+       - AWS: Configurar AWS Lambda ou ferramentas de automação para disparar o failover, diminuindo o RTO para algo próximo de 15-20 minutos.
+    - Replicação Síncrona: 
       - Em ambos os cenários, adotar replicação síncrona (em vez de assíncrona) pode zerar o RPO, garantindo que nenhum dado seja perdido. Isso exige uma conexão de baixa latência e alta largura de banda entre o datacenter local e a nuvem, mas é viável para sistemas financeiros críticos.
-      - Backups Frequentes: 
-          - Azure: O SQL MI suporta backups automáticos com alta frequência (ex.: a cada 1-5 minutos).
-          - AWS: Snapshots frequentes no EC2 ou uso do AWS Backup podem reduzir o RPO para segundos.
-      - Testes Regulares: 
-          - Simulações de falhas devem ser realizadas periodicamente para validar os tempos de RTO e RPO e ajustar as configurações conforme necessário.
+    - Backups Frequentes: 
+      - Azure: O SQL MI suporta backups automáticos com alta frequência (ex.: a cada 1-5 minutos).
+      - AWS: Snapshots frequentes no EC2 ou uso do AWS Backup podem reduzir o RPO para segundos.
+    - Testes Regulares: 
+      - Simulações de falhas devem ser realizadas periodicamente para validar os tempos de RTO e RPO e ajustar as configurações conforme necessário.
 
 Para uma aplicação crítica como fluxo de caixa, o cenário Datacenter Local + Azure Arc com Azure SQL Managed Instance é superior, oferecendo um RTO de 5-15 minutos e um RPO de até 5 minutos, com automação integrada e menor complexidade operacional. Já o cenário Datacenter Local + AWS com MS SQL em EC2 apresenta um RTO mais alto (30-60 minutos) devido à necessidade de intervenção manual, embora o RPO seja comparável (até 5 minutos).
 Para atender aos requisitos mais exigentes (RTO e RPO próximos de zero), recomenda-se implementar replicação síncrona e backups frequentes em ambos os casos, com o Azure se destacando pela facilidade de automação e gerenciamento. Assim, o Azure é a escolha mais robusta e ágil para garantir a continuidade de uma aplicação financeira essencial.
