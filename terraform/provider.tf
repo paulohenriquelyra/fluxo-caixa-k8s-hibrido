@@ -2,15 +2,16 @@ terraform {
   required_version = ">=1.6.0"
   required_providers {
     proxmox = {
-      source = "Telmate/proxmox"
-      version = "2.9.14" # use a última compatível (confira https://registry.terraform.io/providers/Telmate/proxmox/latest)
+      # Mudando para o provedor 'bpg/proxmox', que é mais moderno e compatível com Proxmox 8.x
+      source  = "bpg/proxmox"
+      version = ">= 0.40.2" # Usa a versão 0.40.2 ou a mais recente compatível
     }
   }
 }
 
 provider "proxmox" {
-  pm_api_url      = "https://10.0.2.11:8006/api2/json"
-  pm_user         = var.proxmox_user
-  pm_password     = var.proxmox_password
-  pm_tls_insecure = true              # true para laboratório (ambiente de produção, use certificado válido!)
+  endpoint                 = var.proxmox_api_url
+  username                 = var.proxmox_user
+  password                 = var.proxmox_password
+  insecure                 = true # Apenas para laboratório. Em produção, use 'false' com um certificado válido.
 }

@@ -1,8 +1,9 @@
-# Terraform
-terraform.tfstate
-terraform.tfstate.*
-.terraform/
-crash.log
+# Terraform specific files
+terraform/*.tfstate
+terraform/*.tfstate.backup
+terraform/crash.log
+terraform/.terraform/
+terraform/*.tfvars
 
 # Secrets e arquivos de variáveis reais
 *.tfvars
