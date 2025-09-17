@@ -1,0 +1,24 @@
+# Arquivos de estado do Terraform
+*.tfstate
+*.tfstate.*
+
+# Logs de crash
+crash.log
+crash.*.log
+
+# Exclui todos os arquivos .tfvars, que contêm valores de variáveis e segredos.
+# NUNCA comite arquivos .tfvars se eles contêm segredos.
+*.tfvars
+*.tfvars.json
+
+# Ignora arquivos de override, que são usados para overrides locais
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Diretório local do Terraform
+.terraform/
+
+# Arquivos de sistema operacional
+.DS_Store

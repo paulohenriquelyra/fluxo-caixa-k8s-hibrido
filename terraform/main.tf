@@ -71,9 +71,11 @@ resource "proxmox_virtual_environment_vm" "ubuntu_server" {
 
 output "vm_ip_address" {
   description = "O endereço IP da máquina virtual. Pode levar um ou dois minutos para ser populado após a criação."
-  value       = proxmox_virtual_environment_vm.ubuntu_server.ipv4_addresses[0][0]
+  # O QEMU Agent geralmente retorna a interface de loopback (127.0.0.1) primeiro.
+  # Acessamos o segundo elemento ([1]) para obter o IP da interface de rede principal.
+  value       = proxmox_virtual_environment_vm.ubuntu_server.ipv4_addresses[1][0]
   precondition {
-    condition     = length(proxmox_virtual_environment_vm.ubuntu_server.ipv4_addresses) > 0 && length(proxmox_virtual_environment_vm.ubuntu_server.ipv4_addresses[0]) > 0
+    condition     = length(proxmox_virtual_environment_vm.ubuntu_server.ipv4_addresses) > 1 && length(proxmox_virtual_environment_vm.ubuntu_server.ipv4_addresses[1]) > 0
     error_message = "O endereço IP não pôde ser obtido. Verifique se o QEMU Guest Agent está instalado e rodando na VM."
   }
 }
