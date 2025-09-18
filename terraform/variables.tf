@@ -16,10 +16,15 @@ variable "proxmox_password" {
 }
 
 # Variáveis da VM
-variable "vm_name" {
-  type        = string
-  description = "O nome da máquina virtual a ser criada."
-  default     = "ubuntu-server-tf"
+variable "vms" {
+  type = map(object({
+    name      = string
+    cores     = number
+    memory    = number
+    disk_size = number
+  }))
+  description = "Um mapa de máquinas virtuais a serem criadas. A chave é um identificador lógico (ex: 'node1') e o valor contém os atributos da VM."
+  default     = {}
 }
 
 variable "vm_node" {
@@ -32,28 +37,10 @@ variable "vm_template_id" {
   description = "O VMID (número inteiro) do template de VM com cloud-init a ser clonado."
 }
 
-variable "vm_cores" {
-  type        = number
-  description = "O número de cores de CPU para a VM."
-  default     = 1
-}
-
-variable "vm_memory" {
-  type        = number
-  description = "A quantidade de memória RAM em MB para a VM."
-  default     = 1024
-}
-
 variable "vm_disk_storage" {
   type        = string
   description = "O storage do Proxmox para o disco da VM."
   default     = "local-lvm"
-}
-
-variable "vm_disk_size" {
-  type        = number
-  description = "O tamanho do disco da VM em GB (ex: 20). Deve ser igual ou maior que o disco do template."
-  default     = 3
 }
 
 variable "vm_network_bridge" {

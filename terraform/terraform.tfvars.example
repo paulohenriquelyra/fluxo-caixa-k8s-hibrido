@@ -1,0 +1,84 @@
+# Arquivo de exemplo de variáveis. Renomeie para 'terraform.tfvars' e preencha os valores.
+# NÃO adicione o arquivo 'terraform.tfvars' ao controle de versão se ele contiver segredos.
+
+# -------------------------------------------------
+# Conexão com o Proxmox
+# -------------------------------------------------
+proxmox_api_url = "https://SEU-PROXMOX-IP:8006/api2/json"
+proxmox_user    = "root@pam"
+# A senha do Proxmox deve ser fornecida via variável de ambiente:
+# export TF_VAR_proxmox_password="SUA_SENHA"
+
+# -------------------------------------------------
+# Configurações Gerais da VM
+# -------------------------------------------------
+vm_node        = "pve" # Altere para o nome do seu nó Proxmox
+vm_template_id = 100   # Altere para o ID do seu template Ubuntu Cloud-Init
+
+# -------------------------------------------------
+# Configurações do Cloud-Init
+# -------------------------------------------------
+vm_user = "paulo"
+# A senha do usuário da VM deve ser fornecida via variável de ambiente:
+# export TF_VAR_vm_password="SENHA_DO_USUARIO_VM"
+
+# A chave SSH já tem um valor padrão em variables.tf, mas pode ser sobrescrita aqui se necessário.
+# vm_ssh_key = "ssh-ed25519 AAAA..."
+
+# -------------------------------------------------
+# Definição das Máquinas Virtuais
+# -------------------------------------------------
+# Com base no seu README.md, vamos definir os nós do control plane e os workers.
+vms = {
+  # --- Control Plane Nodes (3) ---
+  "k8s-cp-01" = {
+    name      = "TNode-CP-01"
+    cores     = 4
+    memory    = 8192 # 8 GB
+    disk_size = 150
+  },
+  "k8s-cp-02" = {
+    name      = "TNode-CP-02"
+    cores     = 4
+    memory    = 8192 # 8 GB
+    disk_size = 150
+  },
+  "k8s-cp-03" = {
+    name      = "TNode-CP-03"
+    cores     = 4
+    memory    = 8192 # 8 GB
+    disk_size = 150
+  },
+
+  # --- Worker Nodes (5) ---
+  "k8s-worker-01" = {
+    name      = "TNode-W-01"
+    cores     = 4
+    memory    = 8192 # 8 GB
+    disk_size = 50
+  },
+  "k8s-worker-02" = {
+    name      = "TNode-W-02"
+    cores     = 4
+    memory    = 8192 # 8 GB
+    disk_size = 50
+  },
+  "k8s-worker-03" = {
+    name      = "TNode-W-03"
+    cores     = 4
+    memory    = 8192 # 8 GB
+    disk_size = 50
+  },
+  "k8s-worker-04" = {
+    name      = "TNode-W-04"
+    cores     = 4
+    memory    = 8192 # 8 GB
+    disk_size = 50
+  },
+  "k8s-worker-05" = {
+    name      = "TNode-W-05"
+    cores     = 4
+    memory    = 8192 # 8 GB
+    disk_size = 50
+  }
+}

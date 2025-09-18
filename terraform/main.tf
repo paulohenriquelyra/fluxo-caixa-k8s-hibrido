@@ -9,7 +9,10 @@
 # "create ubuntu cloud-init template proxmox".
 
 resource "proxmox_virtual_environment_vm" "ubuntu_server" {
-  name        = var.vm_name
+  # Itera sobre o mapa de VMs definido em variables.tf
+  for_each = var.vms
+
+  name      = each.value.name
   node_name   = var.vm_node
 
   # Clona a partir de um template existente
@@ -25,14 +28,14 @@ resource "proxmox_virtual_environment_vm" "ubuntu_server" {
   }
 
   cpu {
-    cores   = var.vm_cores
+    cores   = each.value.cores
     sockets = 1
     # 'host' passa as flags da CPU do host para a VM, melhorando a compatibilidade.
     type = "host"
   }
 
   memory {
-    dedicated = var.vm_memory
+    dedicated = each.value.memory
   }
 
   # Define o tipo de controladora SCSI. 'virtio-scsi-pci' é recomendado para templates modernos.
@@ -41,7 +44,7 @@ resource "proxmox_virtual_environment_vm" "ubuntu_server" {
   disk {
     interface    = "scsi0"
     datastore_id = var.vm_disk_storage
-    size         = var.vm_disk_size
+    size         = each.value.disk_size
   }
 
   # Networking
@@ -69,13 +72,13 @@ resource "proxmox_virtual_environment_vm" "ubuntu_server" {
   }
 }
 
-output "vm_ip_address" {
-  description = "O endereço IP da máquina virtual. Pode levar um ou dois minutos para ser populado após a criação."
-  # O QEMU Agent geralmente retorna a interface de loopback (127.0.0.1) primeiro.
-  # Acessamos o segundo elemento ([1]) para obter o IP da interface de rede principal.
-  value       = proxmox_virtual_environment_vm.ubuntu_server.ipv4_addresses[1][0]
-  precondition {
-    condition     = length(proxmox_virtual_environment_vm.ubuntu_server.ipv4_addresses) > 1 && length(proxmox_virtual_environment_vm.ubuntu_server.ipv4_addresses[1]) > 0
-    error_message = "O endereço IP não pôde ser obtido. Verifique se o QEMU Guest Agent está instalado e rodando na VM."
+output "vm_ip_addresses" {
+  description = "Um mapa com os endereços IP das máquinas virtuais criadas."
+  value = {
+    # Cria um mapa de saída com o nome da VM e seu respectivo IP
+    for key, vm in proxmox_virtual_environment_vm.ubuntu_server :
+    key => vm.ipv4_addresses[1][0]
+    # Garante que só tentamos acessar o IP se o QEMU agent retornou a informação
+    if length(vm.ipv4_addresses) > 1 && length(vm.ipv4_addresses[1]) > 0
   }
 }
