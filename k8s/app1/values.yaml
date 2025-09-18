@@ -13,11 +13,11 @@ service:
   port: 80
   targetPort: 8080 # <-- ALTERE para a porta que seu container expõe
 
-resources: {}
-  # É uma boa prática definir limites de recursos. Exemplo:
-  # limits:
-  #   cpu: 200m
-  #   memory: 256Mi
-  # requests:
-  #   cpu: 100m
-  #   memory: 128Mi
+resources:
+  # É uma boa prática definir limites de recursos para garantir a estabilidade do cluster.
+  limits:
+    cpu: 200m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
