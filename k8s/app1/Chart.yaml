@@ -1,0 +1,6 @@
+apiVersion: v2
+name: aplicacao-1
+description: Um Helm Chart para a Aplicacao-1 do projeto Fluxo de Caixa.
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
