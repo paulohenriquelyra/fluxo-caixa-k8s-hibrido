@@ -1,0 +1,15 @@
+---
+- name: Resetar nós do Kubernetes para uma nova instalação
+  hosts: all
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: "Executar kubeadm reset para limpar a configuração"
+      ansible.builtin.command: "kubeadm reset -f"
+      register: reset_result
+      changed_when: "'removed' in reset_result.stdout"
+
+    - name: "Limpar regras de iptables (opcional, mas recomendado)"
+      ansible.builtin.shell: "iptables -F && iptables -t nat -F && iptables -t mangle -F && iptables -X"
+      changed_when: false

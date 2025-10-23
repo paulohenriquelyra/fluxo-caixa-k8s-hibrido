@@ -33,52 +33,52 @@ vms = {
   # --- Control Plane Nodes (3) ---
   "k8s-cp-01" = {
     name      = "TNode-CP-01"
-    cores     = 4
-    memory    = 8192 # 8 GB
-    disk_size = 150
+    cores     = 2
+    memory    = 2048 # 2 GB
+    disk_size = 20
   },
   "k8s-cp-02" = {
     name      = "TNode-CP-02"
-    cores     = 4
-    memory    = 8192 # 8 GB
-    disk_size = 150
+    cores     = 2
+    memory    = 2048 # 2 GB
+    disk_size = 20
   },
   "k8s-cp-03" = {
     name      = "TNode-CP-03"
-    cores     = 4
-    memory    = 8192 # 8 GB
-    disk_size = 150
+    cores     = 2
+    memory    = 2048 # 2 GB
+    disk_size = 20
   },
 
   # --- Worker Nodes (5) ---
   "k8s-worker-01" = {
     name      = "TNode-W-01"
-    cores     = 4
-    memory    = 8192 # 8 GB
-    disk_size = 50
+    cores     = 2
+    memory    = 4096 # 4 GB
+    disk_size = 15
   },
   "k8s-worker-02" = {
     name      = "TNode-W-02"
-    cores     = 4
-    memory    = 8192 # 8 GB
-    disk_size = 50
+    cores     = 2
+    memory    = 4096 # 4 GB
+    disk_size = 15
   },
   "k8s-worker-03" = {
     name      = "TNode-W-03"
-    cores     = 4
-    memory    = 8192 # 8 GB
-    disk_size = 50
+    cores     = 2
+    memory    = 4096 # 4 GB
+    disk_size = 15
   },
   "k8s-worker-04" = {
     name      = "TNode-W-04"
-    cores     = 4
-    memory    = 8192 # 8 GB
-    disk_size = 50
+    cores     = 2
+    memory    = 4096 # 4 GB
+    disk_size = 15
   },
   "k8s-worker-05" = {
     name      = "TNode-W-05"
-    cores     = 4
-    memory    = 8192 # 8 GB
-    disk_size = 50
+    cores     = 2
+    memory    = 4096 # 4 GB
+    disk_size = 15
   }
 }

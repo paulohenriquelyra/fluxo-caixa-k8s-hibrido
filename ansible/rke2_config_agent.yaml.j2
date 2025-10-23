@@ -1,0 +1,3 @@
+# Configuração para nós que se juntam a um cluster existente
+server: https://{{ hostvars[groups['control_plane'][0]]['ansible_host'] }}:9345
+token: "{{ rke2_token }}"

@@ -1,0 +1,24 @@
+"all":
+  "children":
+    "control_plane":
+      "hosts":
+        "TNode-CP-01":
+          "ansible_host": "10.0.3.52"
+        "TNode-CP-02":
+          "ansible_host": "10.0.3.137"
+        "TNode-CP-03":
+          "ansible_host": "10.0.3.206"
+    "workers":
+      "hosts":
+        "TNode-W-01":
+          "ansible_host": "10.0.3.173"
+        "TNode-W-02":
+          "ansible_host": "10.0.2.252"
+        "TNode-W-03":
+          "ansible_host": "10.0.3.216"
+        "TNode-W-04":
+          "ansible_host": "10.0.2.56"
+        "TNode-W-05":
+          "ansible_host": "10.0.2.158"
+  "vars":
+    "ansible_user": "paulo"

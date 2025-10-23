@@ -1,0 +1,10 @@
+---
+- name: Desinstalar RKE2 de todos os nós
+  hosts: all
+  become: true
+  tasks:
+    - name: "Executar o script de desinstalação do RKE2"
+      ansible.builtin.command: /usr/local/bin/rke2-uninstall.sh
+      register: uninstall_result
+      changed_when: uninstall_result.rc == 0
+      failed_when: false # Não falha se o script não existir

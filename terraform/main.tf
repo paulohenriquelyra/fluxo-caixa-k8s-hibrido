@@ -82,3 +82,42 @@ output "vm_ip_addresses" {
     if length(vm.ipv4_addresses) > 1 && length(vm.ipv4_addresses[1]) > 0
   }
 }
+
+# Bloco de Lógica para Estruturar o Inventário Ansible
+locals {
+  # Separa as VMs em grupos de control_plane e workers com base na chave lógica do mapa 'vms'
+  control_plane_hosts = {
+    for k, v in proxmox_virtual_environment_vm.ubuntu_server : v.name => {
+      ansible_host = v.ipv4_addresses[1][0]
+    } if startswith(k, "k8s-cp") && length(v.ipv4_addresses) > 1 && length(v.ipv4_addresses[1]) > 0
+  }
+  worker_hosts = {
+    for k, v in proxmox_virtual_environment_vm.ubuntu_server : v.name => {
+      ansible_host = v.ipv4_addresses[1][0]
+    } if startswith(k, "k8s-worker") && length(v.ipv4_addresses) > 1 && length(v.ipv4_addresses[1]) > 0
+  }
+
+  # Estrutura final do inventário no formato que o Ansible espera
+  ansible_inventory = {
+    all = {
+      children = {
+        control_plane = {
+          hosts = local.control_plane_hosts
+        }
+        workers = {
+          hosts = local.worker_hosts
+        }
+      }
+      vars = {
+        ansible_user = var.vm_user
+      }
+    }
+  }
+}
+
+# Recurso para escrever o arquivo de inventário no disco
+resource "local_file" "ansible_inventory" {
+  # Converte a estrutura de mapa do Terraform para o formato YAML
+  content  = yamlencode(local.ansible_inventory)
+  filename = "${path.module}/../ansible/inventory.yml"
+}

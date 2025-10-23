@@ -1,0 +1,5 @@
+# Configuração para o primeiro servidor RKE2 (inicializador do cluster)
+token: "{{ rke2_token }}"
+tls-san:
+  # Adiciona o IP do nó como um nome alternativo válido para o certificado da API
+  - {{ hostvars[inventory_hostname]['ansible_host'] }}
