@@ -1,0 +1,201 @@
+---
+- name: 0. Preparar todos os nós
+  hosts: all
+  become: true
+  tasks:
+    - name: "Verificar espaço em disco na máquina de controle (localhost)"
+      ansible.builtin.command: df --output=pcent /
+      register: local_disk_space
+      delegate_to: localhost
+      run_once: true
+      changed_when: false
+
+    - name: "Falhar se a máquina de controle tiver menos de 1GB de espaço"
+      ansible.builtin.fail:
+        msg: "Espaço em disco insuficiente na máquina de controle (localhost). Libere espaço em / e tente novamente."
+      when: (local_disk_space.stdout_lines[1] | replace('%', '') | int) > 95
+      delegate_to: localhost
+      run_once: true
+
+    - name: "Verificar espaço em disco e inodes"
+      ansible.builtin.assert:
+        that:
+          - "ansible_mounts | selectattr('mount', 'equalto', '/') | map(attribute='size_available') | first > 1073741824" # > 1GB
+          - "ansible_mounts | selectattr('mount', 'equalto', '/') | map(attribute='inodes_free') | first > 10000" # > 10k inodes
+        fail_msg: >
+          Espaço em disco ou inodes insuficientes em {{ inventory_hostname }}.
+          Espaço livre: {{ (ansible_mounts | selectattr('mount', 'equalto', '/') | map(attribute='size_available') | first / (1024*1024*1024)) | round(2) }} GB.
+          Inodes livres: {{ ansible_mounts | selectattr('mount', 'equalto', '/') | map(attribute='inodes_free') | first }}.
+        success_msg: "Espaço em disco e inodes OK em {{ inventory_hostname }}."
+
+    - name: "Limpar diretório temporário do Ansible"
+      ansible.builtin.file:
+        path: "/home/{{ ansible_user }}/.ansible/tmp"
+        state: absent
+      become: false # Executa como o usuário ansible_user, não como root
+
+    - name: "Desabilitar o firewall ufw para garantir a comunicação do RKE2"
+      ansible.builtin.systemd_service:
+        name: ufw
+        state: stopped
+        enabled: false
+
+- name: 1. Instalar RKE2 Server no primeiro nó do control plane
+  hosts: control_plane[0]
+  become: true
+  vars:
+    # Usar um token estático simplifica a automação com Ansible
+    rke2_token: "fluxo-caixa-k8s-hibrido-secret-token"
+  tasks:
+    - name: "Criar diretório de configuração do RKE2"
+      ansible.builtin.file:
+        path: /etc/rancher/rke2
+        state: directory
+        mode: '0755'
+
+    - name: "Criar arquivo de configuração do servidor RKE2"
+      ansible.builtin.template:
+        src: rke2_config_server.yaml.j2
+        dest: /etc/rancher/rke2/config.yaml
+        mode: '0644'
+
+    - name: "Instalar o servidor RKE2"
+      ansible.builtin.shell: "curl -sfL https://get.rke2.io | INSTALL_RKE2_TYPE=server sh -"
+      args:
+        creates: /usr/local/bin/rke2
+
+    - name: "Habilitar e iniciar o serviço rke2-server"
+      ansible.builtin.systemd_service:
+        name: rke2-server
+        enabled: true
+        state: started
+
+- name: 2. Instalar RKE2 nos outros nós do control plane e workers
+  hosts: control_plane[1:], workers
+  become: true
+  vars:
+    rke2_token: "fluxo-caixa-k8s-hibrido-secret-token"
+  tasks:
+    - name: "Criar diretório de configuração do RKE2"
+      ansible.builtin.file:
+        path: /etc/rancher/rke2
+        state: directory
+        mode: '0755'
+
+    - name: "Criar arquivo de configuração do agente RKE2"
+      ansible.builtin.template:
+        src: rke2_config_agent.yaml.j2
+        dest: /etc/rancher/rke2/config.yaml
+        mode: '0644'
+
+    - name: "Determinar o tipo de instalação do RKE2"
+      ansible.builtin.set_fact:
+        rke2_install_type: "{{ 'server' if inventory_hostname in groups['control_plane'] else 'agent' }}"
+
+    - name: "Instalar o servidor ou agente RKE2"
+      ansible.builtin.shell: "curl -sfL https://get.rke2.io | INSTALL_RKE2_TYPE={{ rke2_install_type }} sh -"
+      args:
+        creates: /usr/local/bin/rke2
+
+    - name: "Habilitar e iniciar o serviço RKE2"
+      ansible.builtin.systemd_service:
+        name: "rke2-{{ rke2_install_type }}"
+        enabled: true
+        state: started
+
+- name: 3. Configurar kubectl para o usuário 'paulo' no primeiro nó
+  hosts: control_plane[0]
+  become: true
+  tasks:
+    - name: "Aguardar o kubeconfig ficar disponível"
+      ansible.builtin.wait_for:
+        path: /etc/rancher/rke2/rke2.yaml
+        timeout: 300
+
+    - name: "Criar diretório .kube para o usuário 'paulo'"
+      ansible.builtin.file:
+        path: "/home/{{ ansible_user }}/.kube"
+        state: directory
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        mode: '0755'
+
+    - name: "Copiar kubeconfig para o usuário 'paulo'"
+      ansible.builtin.copy:
+        src: /etc/rancher/rke2/rke2.yaml
+        dest: "/home/{{ ansible_user }}/.kube/config"
+        remote_src: true
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        mode: '0600'
+
+    - name: "Criar symlink para kubectl"
+      ansible.builtin.file:
+        src: /var/lib/rancher/rke2/bin/kubectl
+        dest: /usr/local/bin/kubectl
+        state: link
+
+- name: 4. Verificar o status do cluster
+  hosts: control_plane[0]
+  tasks:
+    - name: "Aguardar 60 segundos para os nós se registrarem"
+      ansible.builtin.pause:
+        seconds: 60
+
+    - name: "Executar 'kubectl get nodes' e mostrar a saída"
+      ansible.builtin.command: "kubectl get nodes -o wide"
+      environment:
+        KUBECONFIG: "/home/{{ ansible_user }}/.kube/config"
+      register: cluster_status
+      changed_when: false
+
+    - name: "Exibir o status dos nós"
+      ansible.builtin.debug:
+        var: cluster_status.stdout_lines
+#
+# A seção abaixo foi comentada para evitar sobrescrever a configuração manual do kubeconfig.
+# - name: 5. Configurar kubectl localmente na máquina Ansible
+#   hosts: localhost
+#   connection: local
+#   gather_facts: false
+#   vars:
+#     # O IP do primeiro control plane node
+#     control_plane_ip: "{{ hostvars[groups['control_plane'][0]]['ansible_host'] }}"
+#     # O usuário no nó remoto, definido na variável 'all.vars' do inventário
+#     remote_user: "{{ ansible_user }}"
+#   tasks:
+#     - name: "Ler o conteúdo do kubeconfig do primeiro nó do control plane"
+#       ansible.builtin.command: "cat /home/{{ remote_user }}/.kube/config"
+#       delegate_to: "{{ groups['control_plane'][0] }}"
+#       register: kubeconfig_content_raw
+#       changed_when: false
+#
+#     - name: "Substituir o IP do servidor no kubeconfig para acesso externo"
+#       ansible.builtin.set_fact:
+#         kubeconfig_final: "{{ kubeconfig_content_raw.stdout | regex_replace('127.0.0.1', control_plane_ip) }}"
+#
+#     - name: "Criar diretório .kube localmente"
+#       ansible.builtin.file:
+#         path: "{{ lookup('env', 'HOME') }}/.kube"
+#         state: directory
+#         mode: '0755'
+#
+#     - name: "Exibir o kubeconfig final antes de salvar (para depuração)"
+#       ansible.builtin.debug:
+#         var: kubeconfig_final
+#         # no_log: true # Descomente em produção para evitar dados sensíveis nos logs
+#
+#     - name: "Salvar o arquivo kubeconfig localmente"
+#       ansible.builtin.copy:
+#         content: "{{ kubeconfig_final }}"
+#         dest: "{{ lookup('env', 'HOME') }}/.kube/config"
+#         mode: '0600'
+#
+#     - name: "Instruções para o próximo passo"
+#       ansible.builtin.debug:
+#         msg:
+#           - "Configuração do kubectl concluída na sua máquina local (devubuntu2401)!"
+#           - "Para usar, primeiro instale o kubectl se ainda não o fez (procure por 'install kubectl linux')."
+#           - "Depois, em um novo terminal, execute: kubectl get nodes"
+#           - "Se os nós ainda estiverem 'NotReady', aguarde alguns minutos para o CNI (rede) iniciar."
+#           - "Você pode verificar os pods do sistema com: kubectl get pods -A"

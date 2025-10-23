@@ -1,0 +1,23 @@
+# Valores padrão para o chart da aplicacao-1.
+
+replicaCount: 1
+
+image:
+  repository: paulohenriquelyra/fluxo-caixa-app1 # <-- ALTERADO para sua imagem real
+  pullPolicy: IfNotPresent
+  # A tag da imagem a ser usada. Altere este valor para fazer deploy de uma nova versão.
+  tag: "1.0.2" # <-- ALTERADO para uma versão específica para disparar o deploy
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8080 # <-- ALTERE para a porta que seu container expõe
+
+resources:
+  # É uma boa prática definir limites de recursos para garantir a estabilidade do cluster.
+  limits:
+    cpu: 200m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi

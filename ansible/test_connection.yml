@@ -1,0 +1,12 @@
+---
+- name: Testar a conexão e coletar fatos básicos dos hosts
+  hosts: all
+  gather_facts: true
+
+  tasks:
+    - name: 1. Testar a conectividade (ping)
+      ansible.builtin.ping:
+
+    - name: 2. Exibir o nome do host e a distribuição do SO
+      ansible.builtin.debug:
+        msg: "Conectado com sucesso a {{ inventory_hostname }} rodando {{ ansible_distribution }} {{ ansible_distribution_version }}"

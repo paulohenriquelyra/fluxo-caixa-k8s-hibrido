@@ -1,0 +1,24 @@
+# Terraform specific files
+terraform/*.tfstate
+terraform/*.tfstate.backup
+terraform/crash.log
+terraform/.terraform/
+terraform/*.tfvars
+
+# Secrets e arquivos de variáveis reais
+*.tfvars
+*.tfvars.json
+
+# VSCode
+.vscode/
+
+# Node/npm
+node_modules/
+
+# MacOS lixo
+.DS_Store
+
+# Outros diretórios/pastas temporárias
+*.log
+
+# (adapte para outros stacks/tools do projeto conforme necessidade)

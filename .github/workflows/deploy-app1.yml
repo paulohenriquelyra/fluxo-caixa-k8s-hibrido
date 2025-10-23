@@ -1,0 +1,46 @@
+name: Deploy Aplicacao-1
+
+on:
+  push:
+    branches:
+      - main # Dispara o workflow em pushes para a branch main
+    paths:
+      - 'k8s/app1/**' # Dispara apenas se houver mudanças nos manifestos da app1
+
+jobs:
+  deploy:
+    name: Deploy to Kubernetes
+    runs-on: ubuntu-latest
+    # Adiciona o uso de ambientes do GitHub para melhor controle e segurança.
+    # Você precisará criar um ambiente chamado 'production' nas configurações do repositório.
+    environment: production
+
+    steps:
+    - name: Checkout do Código
+      uses: actions/checkout@v4
+
+    - name: Configurar Helm
+      uses: azure/setup-helm@v3
+      with:
+        version: 'v3.9.0' # Ou a versão que preferir
+
+    - name: Configurar kubectl
+      uses: azure/setup-kubectl@v3
+
+    - name: Deploy no Kubernetes
+      run: |
+        # Decodifica o segredo e cria o arquivo de configuração do kubectl
+        echo "${{ secrets.KUBE_CONFIG_BASE64 }}" | base64 --decode > kubeconfig.yaml
+        export KUBECONFIG=kubeconfig.yaml
+
+        # Adiciona um passo de verificação para facilitar o debug
+        echo "Verificando a conexão com o cluster Kubernetes..."
+        kubectl cluster-info
+        kubectl get nodes
+
+        # Faz o deploy/upgrade da aplicação usando Helm, que é mais consistente com o pipeline principal.
+        # Assumindo que 'k8s/app1' é (ou será) um Helm Chart.
+        echo "Realizando deploy da app1 com Helm..."
+        helm upgrade --install app1 k8s/app1/ --namespace app1 --create-namespace --wait
+
+        echo "Deploy concluído com sucesso!"
